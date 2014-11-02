@@ -1,0 +1,16 @@
+#include <stdio.c>
+#include <malloc.h>
+
+typedef struct grafo {
+	char ver;
+	grafo ** adj;
+
+} Grafo;
+
+
+void cria_grafo ( void * novo )
+{
+	novo = (struct grafo *) malloc (sizeof (struct grafo));
+
+}
+
