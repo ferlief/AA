@@ -173,9 +173,9 @@ void graph_arv ( tGraph * pGraph )
 	list_of_adj[8] = "D";
 	list_of_adj[9] = "EL";
 	list_of_adj[10] = "F";
-	list_of_adj[11] = "HO";
-	list_of_adj[12] = "H";
-	list_of_adj[13] = "J";
+	list_of_adj[11] = "J";
+	list_of_adj[12] = "HO";
+	list_of_adj[13] = "H";
 	list_of_adj[14] = "M";
 
 
