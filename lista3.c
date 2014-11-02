@@ -29,16 +29,19 @@ typedef struct graph {
 
 	int * vQueue;
 
+	int * vArticPts;
+
 } tGraph;
 
 
+/* Functions for reation adifferent graphs - prototype */
 
 void graph_lista3 ( tGraph * pGraph );
 
 void graph_arv ( tGraph * pGraph );
 
 
-/* Functions for test and verification  - prototype */
+/* Functions for testing and verification  - prototype */
 
 
 void verifyGraph (tGraph * pGraph);
@@ -65,23 +68,20 @@ void breadthFirstSearch (tGraph * pGraph, int pId);
 
 
 
-// /* DFS Based Algorithms - prototype */
+/* DFS Based Algorithms - prototype */
 
-// int connected (tGraph ** pGraph, char ** pOrder);
+int connected (tGraph * pGraph);
 
-// int acyclic (tGraph ** pGraph, char ** pOrder);
+int acyclic (tGraph * pGraph);
 
-// int acyclic_MV (tGraph ** pGraph, char ** pVisited, int pId, int pIdFather, char ** pOrder);
+/* prob */
+int bipartite (tGraph * pGraph);
 
-// /* prob */
-// int bipartite (tGraph ** pGraph);
+/* prob */
 
-// /* prob */
-// int bipartite_MV (tGraph ** pGraph, char ** pVisited, int pId);
+void articulationPoints (tGraph * pGraph, char ** pArticPts);
 
-// void articulationPoints (tGraph ** pGraph, char ** pArticPts);
-
-//int biconnectedComponents;
+int biconnectedComponents;
 
 /************************************/
 /************* MAIN *****************/
@@ -112,6 +112,212 @@ int main (void)
 /************************************/
 
 
+
+
+
+/* DFS Algorithm - code */
+
+void depthFirstSearch (tGraph * pGraph, int pId)
+{
+	int i=0;
+
+	int SizeAdjList;
+
+	if ((pGraph)->vVisited[pId] == 0)
+	{
+		(pGraph)->vVisited[pId] = 1;
+		
+		for (i=0; (pGraph)->vOrder[i] != 0; i++){}
+		(pGraph)->vOrder[i] = (pGraph)->vVertexes[pId].vertex;
+
+		SizeAdjList = (pGraph)->vVertexes[pId].sizeAdjList;
+
+		
+		for (i=0; i < SizeAdjList; i++)
+		{
+			depthFirstSearch (pGraph, (pGraph)->vVertexes[pId].vAdjList[i].id);
+		}
+	}
+}
+
+
+/* BFS Algorithm - code */
+void breadthFirstSearch (tGraph * pGraph, int pId)
+{
+	int i=0, j=0;
+
+	int IdQ;
+	int IdAdj;
+	int SizeAdjList;
+
+	(pGraph)->vVisited[pId] = 1;
+	
+	for (i=0; (pGraph)->vOrder[i] != 0; i++){}
+	(pGraph)->vOrder[i] = (pGraph)->vVertexes[pId].vertex;
+
+
+	for (i=0; (pGraph)->vQueue[i] != -1; i++){}
+	(pGraph)->vQueue[i] = pId;
+
+
+	while ( (pGraph)->vQueue[0] != -1 )
+	{
+		IdQ = (pGraph)->vQueue[0];
+
+		for (i=0; (pGraph)->vQueue[i] != -1; i++)
+		{
+			(pGraph)->vQueue[i] = (pGraph)->vQueue[i+1];
+		}
+
+		SizeAdjList = (pGraph)->vVertexes[IdQ].sizeAdjList;
+
+		for (j=0; j < SizeAdjList; j++)
+		{
+			IdAdj = (pGraph)->vVertexes[IdQ].vAdjList[j].id;
+
+			if ( (pGraph)->vVisited[IdAdj] == 0)
+			{
+				(pGraph)->vVisited[IdAdj] = 1;
+	
+				for (i=0; (pGraph)->vOrder[i] != 0; i++){}
+				(pGraph)->vOrder[i] = (pGraph)->vVertexes[IdAdj].vertex;
+
+
+				for (i=0; (pGraph)->vQueue[i] != -1; i++){}
+				(pGraph)->vQueue[i] = IdAdj;
+
+			}
+		}
+
+	}
+
+}
+
+
+/* DFS Based Algorithms - codes */
+
+int connected (tGraph * pGraph)
+{
+	int i;
+
+	resetVectors (pGraph);
+	depthFirstSearch (pGraph);
+
+
+	for (i=0; i<(pGraph)->size; i++)
+	{
+		if((pGraph)->vVisited[i] == 0) return 0;
+	}
+	
+	return 1;
+
+}
+
+void depthFirstSearch (tGraph * pGraph, int pId)
+{
+	int i=0;
+
+	int SizeAdjList;
+
+	if ((pGraph)->vVisited[pId] == 0)
+	{
+		(pGraph)->vVisited[pId] = 1;
+		
+		for (i=0; (pGraph)->vOrder[i] != 0; i++){}
+		(pGraph)->vOrder[i] = (pGraph)->vVertexes[pId].vertex;
+
+		SizeAdjList = (pGraph)->vVertexes[pId].sizeAdjList;
+
+		
+		for (i=0; i < SizeAdjList; i++)
+		{
+			depthFirstSearch (pGraph, (pGraph)->vVertexes[pId].vAdjList[i].id);
+		}
+	}
+}
+
+int acyclic (tGraph * pGraph)
+{
+	resetVectors (pGraph);
+
+
+
+
+}
+
+// int bipartite_MV (tGraph ** pGraph, char ** pVisited, int pId)
+// {
+// 	int i, ret = 1;
+
+// 	int SizeAdj = (*pGraph)->nodesList[pId]->size;
+// 	int IdNodeAdj;
+
+
+// 	i=0;
+// 	while (i<SizeAdj)
+// 	{
+// 		IdNodeAdj = (*pGraph)->nodesList[pId]->adjList[i]->id;
+
+// 		if ((*pVisited)[IdNodeAdj] == 0)
+// 			(*pVisited)[IdNodeAdj] = -(*pVisited)[pId];
+// 		else
+// 		{
+// 			if ((*pVisited)[IdNodeAdj] == (*pVisited)[pId]) 
+// 				ret = 0;
+
+// 		}
+
+// 		ret =  bipartite_MV (&(*pGraph), &(*pVisited), IdNodeAdj);
+// 		i++;
+// 	}
+
+// 	return ret;
+// }
+
+// int bipartite (tGraph ** pGraph)
+// {
+// 	int i;
+// 	int size;
+
+// 	char * visited;
+
+// 	size = (*pGraph)->size;
+
+// 	(visited) = (char*) malloc (size*sizeof(char));
+
+
+// 	for (i=0; i<size; i++)
+// 	{
+// 		(visited)[i] = 0;
+// 	}
+
+// 	(visited)[0] = 1;
+// 	if (!bipartite_MV (&(*pGraph), &visited, 0)) 
+// 		return 0;
+// 	else
+// 	{
+// 		for (i=0; i<size; i++)
+// 		{
+// 			if (visited[i] == 0){
+// 				(visited)[i] = 1;
+// 				if (!bipartite_MV (&(*pGraph), &visited, i)) 
+// 					return 0;
+// 			}
+// 	}
+// 		return 1;
+// 	}
+// }
+
+
+// void articulationPoints (tGraph ** pGraph, char ** pArticPts)
+// {
+
+// }
+
+
+
+/* Functions for reation adifferent graphs - code */
+
 void graph_lista3 ( tGraph * pGraph )
 {
 	int i;
@@ -120,7 +326,6 @@ void graph_lista3 ( tGraph * pGraph )
 	char * list_of_vertexes = "ABCDEFGHIJKLMN";
 	char ** list_of_adj;
 
-	//char * visited;
 
 	list_of_adj = (char **) malloc (size * sizeof(char*));
 
@@ -188,6 +393,89 @@ void graph_arv ( tGraph * pGraph )
 	}
 
 }
+
+
+
+/* Functions for graph manipulation  - prototype */
+
+
+void fillGraph (tGraph * pGraph, int pId, char * pAdjList)
+{
+	int i, j;
+	int SizeAdjList;
+
+	SizeAdjList = strlen (pAdjList);
+
+	(pGraph)->vVertexes[pId].vAdjList = (tVertex *) malloc (SizeAdjList*sizeof(tVertex));
+		if ((pGraph)->vVertexes[pId].vAdjList == NULL) exit (1);
+
+	(pGraph)->vVertexes[pId].sizeAdjList = SizeAdjList;
+
+
+
+	i=0, j=0;
+	while ( (i < (pGraph)->size) && (j < SizeAdjList) )
+	{
+		if ( (pGraph)->vVertexes[i].vertex == pAdjList[j])
+		{
+			(pGraph)->vVertexes[pId].vAdjList[j] = (pGraph)->vVertexes[i];
+			i=0;
+			j++;
+			continue;
+		}
+		i++;
+	}
+
+}
+
+void createGraph (tGraph * pGraph, char * pVertexes)
+{
+	int i;
+
+	(pGraph)->size = strlen (pVertexes);
+
+	(pGraph)->vVertexes = (tVertex *) malloc ((pGraph)->size*sizeof(tVertex));
+		if ((pGraph)->vVertexes == NULL) exit (1);
+
+	(pGraph)->vVisited = (char *) malloc ((pGraph)->size*sizeof(char));
+		if ((pGraph)->vVisited == NULL) exit (1);
+	
+	(pGraph)->vOrder = (int *) malloc ((pGraph)->size*sizeof(int));
+		if ((pGraph)->vOrder == NULL) exit (1);
+
+	(pGraph)->vQueue = (int *) malloc ((pGraph)->size*sizeof(int));
+		if ((pGraph)->vQueue == NULL) exit (1);
+
+	(pGraph)->vArticPts = (int *) malloc ((pGraph)->size*sizeof(int));
+		if ((pGraph)->vArticPts == NULL) exit (1);
+
+	for (i=0; i < (pGraph)->size; i++)
+	{
+		(pGraph)->vVertexes[i].vertex = pVertexes[i];
+		(pGraph)->vVertexes[i].id = i;
+		(pGraph)->vVisited[i] = 0;
+		(pGraph)->vOrder[i] = 0;
+		(pGraph)->vQueue[i] = -1;
+		(pGraph)->vArticPts[i] = 0;
+
+	}
+
+}
+
+
+void resetVectors (tGraph * pGraph)
+{
+	int i;
+
+	for (i=0; i < (pGraph)->size; i++)
+	{
+		(pGraph)->vVisited[i] = 0;
+		(pGraph)->vOrder[i] = 0;
+		(pGraph)->vQueue[i] = -1;
+
+	}
+}
+
 
 /* Functions for test and verification  - prototype */
 void verifyGraph (tGraph * pGraph)
@@ -297,320 +585,3 @@ void verifyGraph (tGraph * pGraph)
 
 
 }
-
-
-
-
-/* Functions for graph manipulation  - prototype */
-
-
-void fillGraph (tGraph * pGraph, int pId, char * pAdjList)
-{
-	int i, j;
-	int SizeAdjList;
-
-	SizeAdjList = strlen (pAdjList);
-
-	(pGraph)->vVertexes[pId].vAdjList = (tVertex *) malloc (SizeAdjList*sizeof(tVertex));
-		if ((pGraph)->vVertexes[pId].vAdjList == NULL) exit (1);
-
-	(pGraph)->vVertexes[pId].sizeAdjList = SizeAdjList;
-
-
-
-	i=0, j=0;
-	while ( (i < (pGraph)->size) && (j < SizeAdjList) )
-	{
-		if ( (pGraph)->vVertexes[i].vertex == pAdjList[j])
-		{
-			(pGraph)->vVertexes[pId].vAdjList[j] = (pGraph)->vVertexes[i];
-			i=0;
-			j++;
-			continue;
-		}
-		i++;
-	}
-
-}
-
-void createGraph (tGraph * pGraph, char * pVertexes)
-{
-	int i;
-
-	(pGraph)->size = strlen (pVertexes);
-
-	(pGraph)->vVertexes = (tVertex *) malloc ((pGraph)->size*sizeof(tVertex));
-		if ((pGraph)->vVertexes == NULL) exit (1);
-
-	(pGraph)->vVisited = (char *) malloc ((pGraph)->size*sizeof(char));
-		if ((pGraph)->vVisited == NULL) exit (1);
-	
-	(pGraph)->vOrder = (int *) malloc ((pGraph)->size*sizeof(int));
-		if ((pGraph)->vOrder == NULL) exit (1);
-
-	(pGraph)->vQueue = (int *) malloc ((pGraph)->size*sizeof(int));
-		if ((pGraph)->vQueue == NULL) exit (1);
-
-	for (i=0; i < (pGraph)->size; i++)
-	{
-		(pGraph)->vVertexes[i].vertex = pVertexes[i];
-		(pGraph)->vVertexes[i].id = i;
-		(pGraph)->vVisited[i] = 0;
-		(pGraph)->vOrder[i] = 0;
-		(pGraph)->vQueue[i] = -1;
-
-	}
-
-}
-
-
-void resetVectors (tGraph * pGraph)
-{
-	int i;
-
-	for (i=0; i < (pGraph)->size; i++)
-	{
-		(pGraph)->vVisited[i] = 0;
-		(pGraph)->vOrder[i] = 0;
-		(pGraph)->vQueue[i] = -1;
-
-	}
-}
-
-/* DFS Algorithm - code */
-
-void depthFirstSearch (tGraph * pGraph, int pId)
-{
-	int i=0;
-
-	int SizeAdjList;
-
-	if ((pGraph)->vVisited[pId] == 0)
-	{
-		(pGraph)->vVisited[pId] = 1;
-		
-		for (i=0; (pGraph)->vOrder[i] != 0; i++){}
-		(pGraph)->vOrder[i] = (pGraph)->vVertexes[pId].vertex;
-
-		SizeAdjList = (pGraph)->vVertexes[pId].sizeAdjList;
-
-		
-		for (i=0; i < SizeAdjList; i++)
-		{
-			depthFirstSearch (pGraph, (pGraph)->vVertexes[pId].vAdjList[i].id);
-		}
-	}
-}
-
-
-void breadthFirstSearch (tGraph * pGraph, int pId)
-{
-	int i=0, j=0;
-
-	int IdQ;
-	int IdAdj;
-	int SizeAdjList;
-
-	(pGraph)->vVisited[pId] = 1;
-	
-	for (i=0; (pGraph)->vOrder[i] != 0; i++){}
-	(pGraph)->vOrder[i] = (pGraph)->vVertexes[pId].vertex;
-
-
-	for (i=0; (pGraph)->vQueue[i] != -1; i++){}
-	(pGraph)->vQueue[i] = pId;
-
-
-	while ( (pGraph)->vQueue[0] != -1 )
-	{
-		IdQ = (pGraph)->vQueue[0];
-
-		for (i=0; (pGraph)->vQueue[i] != -1; i++)
-		{
-			(pGraph)->vQueue[i] = (pGraph)->vQueue[i+1];
-		}
-
-		SizeAdjList = (pGraph)->vVertexes[IdQ].sizeAdjList;
-
-		for (j=0; j < SizeAdjList; j++)
-		{
-			IdAdj = (pGraph)->vVertexes[IdQ].vAdjList[j].id;
-
-			if ( (pGraph)->vVisited[IdAdj] == 0)
-			{
-				(pGraph)->vVisited[IdAdj] = 1;
-	
-				for (i=0; (pGraph)->vOrder[i] != 0; i++){}
-				(pGraph)->vOrder[i] = (pGraph)->vVertexes[IdAdj].vertex;
-
-
-				for (i=0; (pGraph)->vQueue[i] != -1; i++){}
-				(pGraph)->vQueue[i] = IdAdj;
-
-			}
-		}
-
-	}
-
-}
-
-
-// /* DFS Based Algorithms - codes */
-
-// int connected (tGraph ** pGraph, char ** pOrder)
-// {
-// 	int i;
-
-// 	char * visited;
-
-// 	depthFirstSearch (&(*pGraph), &visited, &(*pOrder));
-
-
-// 	for (i=0; i<(*pGraph)->size; i++)
-// 	{
-// 		if(visited[i] == 0) return 0;
-// 	}
-	
-// 	return 1;
-
-// }
-
-
-// int acyclic_MV (tGraph ** pGraph, char ** pVisited, int pId, int pIdFather, char ** pOrder)
-// {
-// 	int i, ret = 1;
-
-// 	int SizeAdj = (*pGraph)->nodesList[pId]->size;
-// 	int IdNodeAdj;
-
-
-// 	if ((*pVisited)[pId] == 0)
-// 	{
-// 		(*pVisited)[pId] = 1;
-
-// 		for (i=0; (*pOrder)[i]!=0 ; i++){}
-// 		(*pOrder)[i] = (*pGraph)->nodesList[pId]->name;
-
-// 		i=0;
-// 		while (i<SizeAdj)
-// 		{
-// 			IdNodeAdj = (*pGraph)->nodesList[pId]->adjList[i]->id;
-// 			ret =  acyclic_MV (&(*pGraph), &(*pVisited), IdNodeAdj, pId, &(*pOrder));
-// 			i++;
-// 		}
-// 	}
-// 	else
-// 	{
-// 		if (pId != pIdFather) ret = 0;
-// 	}
-
-// 	return ret;
-// }
-
-// int acyclic (tGraph ** pGraph, char ** pOrder)
-// {
-
-// 	int i;
-// 	int size;
-
-// 	char * visited;
-
-// 	size = (*pGraph)->size;
-
-// 	(visited) = (char*) malloc (size*sizeof(char));
-// 	(*pOrder) = (char*) malloc (size*sizeof(char));
-
-
-// 	for (i=0; i<size; i++)
-// 	{
-// 		(visited)[i] = 0;
-// 		(*pOrder)[i] = 0;
-// 	}
-
-// 	if (!acyclic_MV (&(*pGraph), &(visited), 0, 0, &(*pOrder))){
-// 		return 0;
-// 	}
-// 	else
-// 	{
-// 		for (i=0; i<size; i++)
-// 		{
-// 			if (visited[i] == 0){
-// 				if (!acyclic_MV (&(*pGraph), &visited, i, i, &(*pOrder))) 
-// 				{
-// 					// printf("%c    ", (*pOrder)[0]);
-// 					return 0;
-// 				}
-// 			}
-// 		}
-// 		return 1;
-// 	}
-// }
-
-// int bipartite_MV (tGraph ** pGraph, char ** pVisited, int pId)
-// {
-// 	int i, ret = 1;
-
-// 	int SizeAdj = (*pGraph)->nodesList[pId]->size;
-// 	int IdNodeAdj;
-
-
-// 	i=0;
-// 	while (i<SizeAdj)
-// 	{
-// 		IdNodeAdj = (*pGraph)->nodesList[pId]->adjList[i]->id;
-
-// 		if ((*pVisited)[IdNodeAdj] == 0)
-// 			(*pVisited)[IdNodeAdj] = -(*pVisited)[pId];
-// 		else
-// 		{
-// 			if ((*pVisited)[IdNodeAdj] == (*pVisited)[pId]) 
-// 				ret = 0;
-
-// 		}
-
-// 		ret =  bipartite_MV (&(*pGraph), &(*pVisited), IdNodeAdj);
-// 		i++;
-// 	}
-
-// 	return ret;
-// }
-
-// int bipartite (tGraph ** pGraph)
-// {
-// 	int i;
-// 	int size;
-
-// 	char * visited;
-
-// 	size = (*pGraph)->size;
-
-// 	(visited) = (char*) malloc (size*sizeof(char));
-
-
-// 	for (i=0; i<size; i++)
-// 	{
-// 		(visited)[i] = 0;
-// 	}
-
-// 	(visited)[0] = 1;
-// 	if (!bipartite_MV (&(*pGraph), &visited, 0)) 
-// 		return 0;
-// 	else
-// 	{
-// 		for (i=0; i<size; i++)
-// 		{
-// 			if (visited[i] == 0){
-// 				(visited)[i] = 1;
-// 				if (!bipartite_MV (&(*pGraph), &visited, i)) 
-// 					return 0;
-// 			}
-// 	}
-// 		return 1;
-// 	}
-// }
-
-
-// void articulationPoints (tGraph ** pGraph, char ** pArticPts)
-// {
-
-// }
