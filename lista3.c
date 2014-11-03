@@ -74,14 +74,16 @@ int connected (tGraph * pGraph);
 
 int acyclic (tGraph * pGraph);
 
-/* prob */
-int bipartite (tGraph * pGraph);
+int acyclic_dfs (tGraph * pGraph, int pId, int pIdF);
 
 /* prob */
+//int bipartite (tGraph * pGraph);
 
-void articulationPoints (tGraph * pGraph, char ** pArticPts);
+/* prob */
 
-int biconnectedComponents;
+//void articulationPoints (tGraph * pGraph, char ** pArticPts);
+
+//int biconnectedComponents;
 
 /************************************/
 /************* MAIN *****************/
@@ -201,7 +203,7 @@ int connected (tGraph * pGraph)
 	int i;
 
 	resetVectors (pGraph);
-	depthFirstSearch (pGraph);
+	depthFirstSearch (pGraph, 0);
 
 
 	for (i=0; i<(pGraph)->size; i++)
@@ -213,35 +215,63 @@ int connected (tGraph * pGraph)
 
 }
 
-void depthFirstSearch (tGraph * pGraph, int pId)
+int acyclic_dfs (tGraph * pGraph, int pId, int pIdF)
 {
 	int i=0;
 
+	int ret = 1;
 	int SizeAdjList;
+	int IdAdj;
 
-	if ((pGraph)->vVisited[pId] == 0)
+	(pGraph)->vVisited[pId] = 1;
+	
+	for (i=0; (pGraph)->vOrder[i] != 0; i++){}
+	(pGraph)->vOrder[i] = (pGraph)->vVertexes[pId].vertex;
+
+	SizeAdjList = (pGraph)->vVertexes[pId].sizeAdjList;
+
+	
+	for (i=0; i < SizeAdjList; i++)
 	{
-		(pGraph)->vVisited[pId] = 1;
-		
-		for (i=0; (pGraph)->vOrder[i] != 0; i++){}
-		(pGraph)->vOrder[i] = (pGraph)->vVertexes[pId].vertex;
+		IdAdj = (pGraph)->vVertexes[pId].vAdjList[i].id;
 
-		SizeAdjList = (pGraph)->vVertexes[pId].sizeAdjList;
-
-		
-		for (i=0; i < SizeAdjList; i++)
+		if ((pGraph)->vVisited[IdAdj] == 1)
 		{
-			depthFirstSearch (pGraph, (pGraph)->vVertexes[pId].vAdjList[i].id);
+			if (IdAdj != pIdF) ret = 0;
+		}
+		else 
+		{
+			ret = acyclic_dfs (pGraph, IdAdj, pId);
 		}
 	}
+
+	return ret;
 }
 
 int acyclic (tGraph * pGraph)
 {
+	int i;
+
 	resetVectors (pGraph);
 
-
-
+	if (!acyclic_dfs(pGraph, 0, 0))
+	{
+		return 0;
+	}
+	else
+	{
+		for (i=0; i < (pGraph)->size ; i++)
+		{
+			if ((pGraph)->vVisited[i] == 0)
+			{
+				if (!acyclic_dfs(pGraph, i, i))
+				{
+					return 0;
+				}
+			}
+		}
+	}
+	return 1;
 
 }
 
@@ -550,8 +580,67 @@ void verifyGraph (tGraph * pGraph)
 
 	printf("\n");
 
-	printf("/***********************************/");
-	printf ("\n");
+	/***********************************/
+
+	if (connected(pGraph))
+		printf("graph's connected.\n");
+	else
+		printf("graph's not connected.\n");
+	printf("\n");
+
+	printf("\n");
+
+
+	printf("bfs visited list from 0 - connected:\n");
+	
+	for(i=0; i < (pGraph)->size; i++)
+	{
+		printf("%d ", (pGraph)->vVisited[i]);
+	}
+	printf("\n");
+
+	printf("\n");
+
+	printf("bfs order visited list from 0 - connected:\n");
+	
+	for(i=0; i < (pGraph)->size; i++)
+	{
+		printf("%c ", (pGraph)->vOrder[i]);
+	}
+	printf("\n");
+
+	printf("\n");
+
+	/***********************************/
+
+	if (acyclic(pGraph))
+		printf("graph's acyclic.\n");
+	else
+		printf("graph's not acyclic.\n");
+	printf("\n");
+
+	printf("\n");
+
+
+	printf("bfs visited list from 0 - acyclic:\n");
+	
+	for(i=0; i < (pGraph)->size; i++)
+	{
+		printf("%d ", (pGraph)->vVisited[i]);
+	}
+	printf("\n");
+
+	printf("\n");
+
+	printf("bfs order visited list from 0 - acyclic:\n");
+	
+	for(i=0; i < (pGraph)->size; i++)
+	{
+		printf("%c ", (pGraph)->vOrder[i]);
+	}
+	printf("\n");
+
+	printf("\n");
 	// /***********************************/
 	// if (connected (&(*pGraph), &order))
 	// 	printf("graph's connected.\n");
