@@ -249,7 +249,7 @@ void markVisited (tGraph ** pGraph, char ** pVisited, int pId, char ** pOrder)
 			}
 			i++;
 		}
-
+		
 		markVisited (&(*pGraph), &(*pVisited), IdNodeAdj, &(*pOrder));
 	}
 
